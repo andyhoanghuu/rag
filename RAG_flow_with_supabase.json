@@ -1,0 +1,346 @@
+{
+  "name": "RAG",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        848
+      ],
+      "id": "a754bda2-ce58-48dc-a343-4dbd0f9ef717",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Xin chào, em là trợ lý ảo của ngân hàng SHB. Rất vui được phục vụ anh chị!",
+        "options": {
+          "subtitle": "Trợ lý ảo SHB",
+          "title": "Xin chào quý khách!"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -592,
+        208
+      ],
+      "id": "eb2a465e-5116-48b5-9d2d-ede1b45bbaf1",
+      "name": "When chat message received",
+      "webhookId": "63a3426c-f148-4663-9d13-2b1ff5c3b6d5"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Bạn là trợ lý ảo của ngân hàng SHB. Hãy sử dụng những dữ liệu được cung cấp để trả lời."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        0
+      ],
+      "id": "c73c280d-bf56-48b1-9a9f-de69e5e921ea",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        224
+      ],
+      "id": "67b6d32d-5bac-4d63-9321-5cf8d55592c8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Lấy thông tin về các dịch vụ ngân hàng SHB",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        224
+      ],
+      "id": "606f5732-41f3-4ccf-bfac-f90c9dcd0804",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "5ps8Ne1S3pOFLUNU",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        848
+      ],
+      "id": "8f87a638-cbf2-4161-a670-e01ff3debef1",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "5ps8Ne1S3pOFLUNU",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.shb.com.vn/wp-content/uploads/2021/12/H%C6%AF%E1%BB%9ANG-D%E1%BA%AAN-S%E1%BB%AC-D%E1%BB%A4NG-TH%E1%BA%BA-T%C3%8DN-D%E1%BB%A4NG_2-1.pdf",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -368,
+        848
+      ],
+      "id": "bcf50396-a0cb-44ab-a091-2fc647686741",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        1072
+      ],
+      "id": "49839542-9f39-40ae-81d8-fe42911865b2",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        64,
+        1280
+      ],
+      "id": "58c3e340-ec21-4c65-ba9b-65c29e2f34be",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        1072
+      ],
+      "id": "4672810f-ecd8-4a83-8238-80c1e2ad2b9c",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "RKtOeR8ZPlRL4LcF",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        432
+      ],
+      "id": "80ce3528-9041-4c7d-8b2e-63eff7543324",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "RKtOeR8ZPlRL4LcF",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        224
+      ],
+      "id": "82cc1ec5-f16a-43a7-ba2a-a778376ca90b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "RKtOeR8ZPlRL4LcF",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f204877d-eec9-4983-9d4a-b162c3a835dd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d406245e32f1be19f4ce4f2233ff7605fe07f33e6d809c3426181d8ac13a088f"
+  },
+  "id": "BKBIo7sG2Wl1i8Cf",
+  "tags": []
+}
